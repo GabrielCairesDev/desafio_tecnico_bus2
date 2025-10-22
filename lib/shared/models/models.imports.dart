@@ -1,0 +1,9 @@
+export 'user.model.dart';
+export 'name.model.dart';
+export 'location.model.dart';
+export 'login.model.dart';
+export 'dob.model.dart';
+export 'registered.model.dart';
+export 'id.model.dart';
+export 'picture.model.dart';
+export 'api_response.model.dart';
