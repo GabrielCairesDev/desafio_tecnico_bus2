@@ -3,14 +3,19 @@ import 'package:desafio_tecnico_bus2/shared/services/storage.service.dart';
 import 'package:flutter/material.dart';
 
 class UsersViewModel extends ChangeNotifier {
+  final IStorageService _storageService;
+  
   bool isLoading = true;
   List<UserModel> listUsers = [];
   final errorMessage = ValueNotifier<String>('');
 
+  UsersViewModel({required IStorageService storageService}) 
+      : _storageService = storageService;
+
   void getUsers() async {
     try {
       errorMessage.value = '';
-      listUsers = await StorageService.getUsersList();
+      listUsers = await _storageService.getUsersList();
     } catch (e) {
       errorMessage.value = 'Erro ao carregar lista de usuários salvos.';
       debugPrint('Erro ao carregar lista de usuários: $e');
@@ -23,7 +28,7 @@ class UsersViewModel extends ChangeNotifier {
   void removeUser(UserModel user) async {
     try {
       errorMessage.value = '';
-      final success = await StorageService.removeUserFromList(user.login.uuid);
+      final success = await _storageService.removeUserFromList(user.login.uuid);
       if (success) {
         listUsers.remove(user);
       } else {

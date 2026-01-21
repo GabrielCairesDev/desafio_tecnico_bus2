@@ -3,14 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:desafio_tecnico_bus2/shared/models/user.model.dart';
 
-class StorageService {
+abstract class IStorageService {
+  Future<bool> saveUserToList(UserModel user);
+  Future<List<UserModel>> getUsersList();
+  Future<bool> removeUserFromList(String userUuid);
+  Future<bool> clearUsersList();
+  Future<bool> isUserInList(String userUuid);
+}
+
+class StorageService implements IStorageService {
   static const String _usersListKey = 'saved_users_list';
+  final SharedPreferences _prefs;
 
-  static Future<bool> saveUserToList(UserModel user) async {
+  StorageService(this._prefs);
+
+  @override
+  Future<bool> saveUserToList(UserModel user) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-
-      final existingUsersJson = prefs.getString(_usersListKey);
+      final existingUsersJson = _prefs.getString(_usersListKey);
       List<UserModel> usersList = [];
 
       if (existingUsersJson != null) {
@@ -32,7 +42,7 @@ class StorageService {
       final updatedUsersJson = usersList.map((u) => u.toJson()).toList();
       final jsonString = jsonEncode(updatedUsersJson);
 
-      final result = await prefs.setString(_usersListKey, jsonString);
+      final result = await _prefs.setString(_usersListKey, jsonString);
       if (result) {
         if (existingUserIndex != -1) {
           debugPrint('Usuário atualizado com sucesso na lista');
@@ -47,10 +57,10 @@ class StorageService {
     }
   }
 
-  static Future<List<UserModel>> getUsersList() async {
+  @override
+  Future<List<UserModel>> getUsersList() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final usersJson = prefs.getString(_usersListKey);
+      final usersJson = _prefs.getString(_usersListKey);
 
       if (usersJson != null) {
         final List<dynamic> usersList = jsonDecode(usersJson);
@@ -70,10 +80,10 @@ class StorageService {
     }
   }
 
-  static Future<bool> removeUserFromList(String userUuid) async {
+  @override
+  Future<bool> removeUserFromList(String userUuid) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final usersJson = prefs.getString(_usersListKey);
+      final usersJson = _prefs.getString(_usersListKey);
 
       if (usersJson != null) {
         final List<dynamic> usersListData = jsonDecode(usersJson);
@@ -86,7 +96,7 @@ class StorageService {
         final updatedUsersJson = usersList.map((u) => u.toJson()).toList();
         final jsonString = jsonEncode(updatedUsersJson);
 
-        final result = await prefs.setString(_usersListKey, jsonString);
+        final result = await _prefs.setString(_usersListKey, jsonString);
         if (result) {
           debugPrint('Usuário removido com sucesso da lista');
         }
@@ -99,10 +109,10 @@ class StorageService {
     }
   }
 
-  static Future<bool> clearUsersList() async {
+  @override
+  Future<bool> clearUsersList() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final result = await prefs.remove(_usersListKey);
+      final result = await _prefs.remove(_usersListKey);
       if (result) {
         debugPrint('Lista de usuários limpa com sucesso');
       }
@@ -113,7 +123,8 @@ class StorageService {
     }
   }
 
-  static Future<bool> isUserInList(String userUuid) async {
+  @override
+  Future<bool> isUserInList(String userUuid) async {
     try {
       final users = await getUsersList();
       return users.any((user) => user.login.uuid == userUuid);

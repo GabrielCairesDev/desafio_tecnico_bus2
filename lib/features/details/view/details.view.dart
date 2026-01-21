@@ -1,5 +1,7 @@
+import 'package:desafio_tecnico_bus2/config/injection.dart';
 import 'package:desafio_tecnico_bus2/features/details/viewmodel/details.viewmodel.dart';
 import 'package:desafio_tecnico_bus2/shared/models/user.model.dart';
+import 'package:desafio_tecnico_bus2/shared/services/storage.service.dart';
 import 'package:desafio_tecnico_bus2/shared/widgets/widgets.imports.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +20,7 @@ class _DetailsViewState extends State<DetailsView> {
   @override
   void initState() {
     super.initState();
-    _viewModel = DetailsViewModel();
+    _viewModel = DetailsViewModel(storageService: getIt<IStorageService>());
     _viewModel.checkIfUserIsSaved(widget.selectedUser.login.uuid);
   }
 

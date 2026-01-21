@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 class HomeViewModel extends ChangeNotifier {
+  final IUserService _userService;
+  
   List<UserModel> listUsers = [];
   final errorMessage = ValueNotifier<String>('');
 
@@ -11,6 +13,8 @@ class HomeViewModel extends ChangeNotifier {
 
   Ticker? _ticker;
   int _lastExecutionSecond = 0;
+
+  HomeViewModel({required IUserService userService}) : _userService = userService;
 
   Future<void> initialize(TickerProvider vsync) async {
     await fetchUser();
@@ -34,7 +38,7 @@ class HomeViewModel extends ChangeNotifier {
   Future<void> fetchUser() async {
     try {
       errorMessage.value = '';
-      final newUser = (await UserService.getUser()).results;
+      final newUser = (await _userService.getUser()).results;
       listUsers.addAll(newUser);
       notifyListeners();
     } catch (e) {
