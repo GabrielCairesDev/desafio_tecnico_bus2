@@ -26,7 +26,7 @@ class DetailsViewModel extends ChangeNotifier {
 
   void initialize() {
     _isLoading = true;
-    final user = _selectedUserService.selectedUser;
+    final user = _selectedUserService.takeSelectedUser();
 
     if (user == null) {
       throw Exception(
@@ -80,6 +80,7 @@ class DetailsViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    _selectedUserService.clearSelectedUser();
     super.dispose();
   }
 }
