@@ -2,6 +2,7 @@
 import 'package:desafio_tecnico_bus2/config/injection.dart';
 import 'package:desafio_tecnico_bus2/config/routes.config.dart';
 import 'package:desafio_tecnico_bus2/shared/repositories/repositories.imports.dart';
+import 'package:desafio_tecnico_bus2/shared/services/selected_user.service.dart';
 import 'package:desafio_tecnico_bus2/shared/widgets/widgets.imports.dart';
 import 'package:flutter/material.dart';
 import '../viewmodel/home.viewmodel.dart';
@@ -40,8 +41,10 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           errorMessage: _viewModel.errorMessage,
           body: ListUsersWidget(
             listUsers: _viewModel.listUsers,
-            onTap: (user) =>
-                Navigator.pushNamed(context, Routes.details, arguments: user),
+            onTap: (user) {
+              getIt<SelectedUserService>().setSelectedUser(user);
+              Navigator.pushNamed(context, Routes.details);
+            },
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () => Navigator.pushNamed(context, Routes.users),

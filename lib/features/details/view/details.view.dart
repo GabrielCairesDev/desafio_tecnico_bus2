@@ -2,13 +2,12 @@ import 'package:desafio_tecnico_bus2/config/injection.dart';
 import 'package:desafio_tecnico_bus2/features/details/viewmodel/details.viewmodel.dart';
 import 'package:desafio_tecnico_bus2/shared/models/user.model.dart';
 import 'package:desafio_tecnico_bus2/shared/repositories/repositories.imports.dart';
+import 'package:desafio_tecnico_bus2/shared/services/selected_user.service.dart';
 import 'package:desafio_tecnico_bus2/shared/widgets/widgets.imports.dart';
 import 'package:flutter/material.dart';
 
 class DetailsView extends StatefulWidget {
-  const DetailsView({super.key, required this.selectedUser});
-
-  final UserModel selectedUser;
+  const DetailsView({super.key});
 
   @override
   State<DetailsView> createState() => _DetailsViewState();
@@ -16,14 +15,25 @@ class DetailsView extends StatefulWidget {
 
 class _DetailsViewState extends State<DetailsView> {
   late final DetailsViewModel _viewModel;
+  late final UserModel _selectedUser;
 
   @override
   void initState() {
     super.initState();
+    final selectedUserService = getIt<SelectedUserService>();
+    final user = selectedUserService.selectedUser;
+
+    if (user == null) {
+      throw Exception(
+        'Nenhum usuário selecionado. É necessário selecionar um usuário antes de navegar para detalhes.',
+      );
+    }
+
+    _selectedUser = user;
     _viewModel = DetailsViewModel(
       userStorageRepository: getIt<IUserStorageRepository>(),
     );
-    _viewModel.checkIfUserIsSaved(widget.selectedUser.login.uuid);
+    _viewModel.checkIfUserIsSaved(_selectedUser.login.uuid);
   }
 
   @override
@@ -52,12 +62,12 @@ class _DetailsViewState extends State<DetailsView> {
             errorMessage: _viewModel.errorMessage,
             body: _viewModel.isLoading
                 ? Center(child: CircularProgressIndicator())
-                : UserDetailsWidget(user: widget.selectedUser),
+                : UserDetailsWidget(user: _selectedUser),
             floatingActionButton: SaveFabWidget(
               show: _viewModel.isUserSaved,
               isLoading: _viewModel.isLoading,
               onPressed: () async {
-                await _viewModel.onPressSave(widget.selectedUser);
+                await _viewModel.onPressSave(_selectedUser);
               },
             ),
           );

@@ -2,6 +2,7 @@ import 'package:desafio_tecnico_bus2/config/injection.dart';
 import 'package:desafio_tecnico_bus2/config/routes.config.dart';
 import 'package:desafio_tecnico_bus2/features/users/viewmodel/users.viewmodel.dart';
 import 'package:desafio_tecnico_bus2/shared/repositories/repositories.imports.dart';
+import 'package:desafio_tecnico_bus2/shared/services/selected_user.service.dart';
 import 'package:desafio_tecnico_bus2/shared/widgets/widgets.imports.dart';
 import 'package:flutter/material.dart';
 
@@ -43,10 +44,10 @@ class _UsersViewState extends State<UsersView> {
               : ListUsersWidget(
                   listUsers: _viewModel.listUsers,
                   onTap: (user) async {
+                    getIt<SelectedUserService>().setSelectedUser(user);
                     final result = await Navigator.pushNamed(
                       context,
                       Routes.details,
-                      arguments: user,
                     );
                     if (result == true) {
                       _viewModel.refreshUsers();
