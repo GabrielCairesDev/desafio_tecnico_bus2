@@ -10,12 +10,19 @@ class UsersView extends StatefulWidget {
 }
 
 class _UsersViewState extends State<UsersView> {
-  final _viewModel = UsersViewModel();
+  late final UsersViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
+    _viewModel = UsersViewModel();
     _viewModel.getUsers();
+  }
+
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
   }
 
   @override

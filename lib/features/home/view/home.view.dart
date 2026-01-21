@@ -12,7 +12,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
-  final _viewModel = HomeViewModel();
+  late final HomeViewModel _viewModel;
 
   static const int _intervalSeconds = 5;
 
@@ -22,6 +22,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    _viewModel = HomeViewModel();
     _startTicker();
   }
 

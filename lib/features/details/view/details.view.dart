@@ -13,12 +13,19 @@ class DetailsView extends StatefulWidget {
 }
 
 class _DetailsViewState extends State<DetailsView> {
-  final _viewModel = DetailsViewModel();
+  late final DetailsViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
+    _viewModel = DetailsViewModel();
     _viewModel.checkIfUserIsSaved(widget.selectedUser.login.uuid);
+  }
+
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
   }
 
   @override
