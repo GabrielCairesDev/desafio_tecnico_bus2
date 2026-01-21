@@ -1,7 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:desafio_tecnico_bus2/shared/models/user.model.dart';
+import 'persistence.service.dart';
 
 abstract class IStorageService {
   Future<bool> saveUserToList(UserModel user);
@@ -13,22 +12,17 @@ abstract class IStorageService {
 
 class StorageService implements IStorageService {
   static const String _usersListKey = 'saved_users_list';
-  final SharedPreferences _prefs;
+  final IPersistenceService _persistence;
 
-  StorageService(this._prefs);
+  StorageService(this._persistence);
 
   @override
   Future<bool> saveUserToList(UserModel user) async {
     try {
-      final existingUsersJson = _prefs.getString(_usersListKey);
-      List<UserModel> usersList = [];
-
-      if (existingUsersJson != null) {
-        final List<dynamic> usersListData = jsonDecode(existingUsersJson);
-        usersList = usersListData
-            .map((userMap) => UserModel.fromJson(userMap))
-            .toList();
-      }
+      final existingUsersData = await _persistence.loadList(_usersListKey);
+      List<UserModel> usersList = existingUsersData
+          .map((userMap) => UserModel.fromJson(userMap))
+          .toList();
 
       final existingUserIndex = usersList.indexWhere(
         (u) => u.login.uuid == user.login.uuid,
@@ -40,9 +34,11 @@ class StorageService implements IStorageService {
       }
 
       final updatedUsersJson = usersList.map((u) => u.toJson()).toList();
-      final jsonString = jsonEncode(updatedUsersJson);
+      final result = await _persistence.saveList(
+        _usersListKey,
+        updatedUsersJson,
+      );
 
-      final result = await _prefs.setString(_usersListKey, jsonString);
       if (result) {
         if (existingUserIndex != -1) {
           debugPrint('Usuário atualizado com sucesso na lista');
@@ -60,11 +56,10 @@ class StorageService implements IStorageService {
   @override
   Future<List<UserModel>> getUsersList() async {
     try {
-      final usersJson = _prefs.getString(_usersListKey);
+      final usersData = await _persistence.loadList(_usersListKey);
 
-      if (usersJson != null) {
-        final List<dynamic> usersList = jsonDecode(usersJson);
-        final result = usersList
+      if (usersData.isNotEmpty) {
+        final result = usersData
             .map((userMap) => UserModel.fromJson(userMap))
             .toList();
         debugPrint(
@@ -83,20 +78,21 @@ class StorageService implements IStorageService {
   @override
   Future<bool> removeUserFromList(String userUuid) async {
     try {
-      final usersJson = _prefs.getString(_usersListKey);
+      final usersData = await _persistence.loadList(_usersListKey);
 
-      if (usersJson != null) {
-        final List<dynamic> usersListData = jsonDecode(usersJson);
-        List<UserModel> usersList = usersListData
+      if (usersData.isNotEmpty) {
+        List<UserModel> usersList = usersData
             .map((userMap) => UserModel.fromJson(userMap))
             .toList();
 
         usersList.removeWhere((user) => user.login.uuid == userUuid);
 
         final updatedUsersJson = usersList.map((u) => u.toJson()).toList();
-        final jsonString = jsonEncode(updatedUsersJson);
+        final result = await _persistence.saveList(
+          _usersListKey,
+          updatedUsersJson,
+        );
 
-        final result = await _prefs.setString(_usersListKey, jsonString);
         if (result) {
           debugPrint('Usuário removido com sucesso da lista');
         }
@@ -112,7 +108,7 @@ class StorageService implements IStorageService {
   @override
   Future<bool> clearUsersList() async {
     try {
-      final result = await _prefs.remove(_usersListKey);
+      final result = await _persistence.delete(_usersListKey);
       if (result) {
         debugPrint('Lista de usuários limpa com sucesso');
       }
@@ -126,19 +122,16 @@ class StorageService implements IStorageService {
   @override
   Future<bool> isUserInList(String userUuid) async {
     try {
-      final usersJson = _prefs.getString(_usersListKey);
+      final usersData = await _persistence.loadList(_usersListKey);
 
-      if (usersJson == null) {
+      if (usersData.isEmpty) {
         return false;
       }
 
-      final List<dynamic> usersListData = jsonDecode(usersJson);
-      return usersListData.any((userMap) {
-        if (userMap is Map<String, dynamic>) {
-          final login = userMap['login'];
-          if (login is Map<String, dynamic>) {
-            return login['uuid'] == userUuid;
-          }
+      return usersData.any((userMap) {
+        final login = userMap['login'];
+        if (login is Map<String, dynamic>) {
+          return login['uuid'] == userUuid;
         }
         return false;
       });

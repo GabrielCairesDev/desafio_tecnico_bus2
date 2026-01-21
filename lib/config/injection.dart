@@ -1,6 +1,8 @@
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../shared/services/storage.service.dart';
+import '../shared/services/persistence.service.dart';
+import '../shared/services/shared_preferences_persistence.service.dart';
 import '../shared/services/user.services.dart';
 import '../shared/services/selected_user.service.dart';
 import '../shared/repositories/repositories.imports.dart';
@@ -14,8 +16,13 @@ Future<void> setupInjection() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   getIt.registerSingleton<SharedPreferences>(sharedPreferences);
 
+  // Registra a implementação de persistência (pode ser trocada facilmente)
+  getIt.registerLazySingleton<IPersistenceService>(
+    () => SharedPreferencesPersistence(getIt<SharedPreferences>()),
+  );
+
   getIt.registerLazySingleton<IStorageService>(
-    () => StorageService(getIt<SharedPreferences>()),
+    () => StorageService(getIt<IPersistenceService>()),
   );
 
   getIt.registerLazySingleton<IUserService>(() => UserService());
