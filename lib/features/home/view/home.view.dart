@@ -1,7 +1,6 @@
 // lib/features/home/view/home.view.dart
 import 'package:desafio_tecnico_bus2/shared/widgets/widgets.imports.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import '../viewmodel/home.viewmodel.dart';
 
 class HomeView extends StatefulWidget {
@@ -14,35 +13,15 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   late final HomeViewModel _viewModel;
 
-  static const int _intervalSeconds = 5;
-
-  Ticker? _ticker;
-  int _lastExecutionSecond = 0;
-
   @override
   void initState() {
     super.initState();
     _viewModel = HomeViewModel();
-    _startTicker();
-  }
-
-  void _startTicker() {
-    _ticker = createTicker((elapsed) {
-      final currentSecond = elapsed.inSeconds;
-
-      if (currentSecond > 0 &&
-          currentSecond % _intervalSeconds == 0 &&
-          currentSecond != _lastExecutionSecond) {
-        _lastExecutionSecond = currentSecond;
-        _viewModel.onTick();
-      }
-    });
-    _ticker?.start();
+    _viewModel.startTicker(this);
   }
 
   @override
   void dispose() {
-    _ticker?.dispose();
     _viewModel.dispose();
     super.dispose();
   }
