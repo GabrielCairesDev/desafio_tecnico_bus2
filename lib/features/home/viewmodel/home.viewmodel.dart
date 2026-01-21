@@ -1,5 +1,6 @@
 import 'package:desafio_tecnico_bus2/shared/models/models.imports.dart';
 import 'package:desafio_tecnico_bus2/shared/repositories/repositories.imports.dart';
+import 'package:desafio_tecnico_bus2/shared/exceptions/repository_exception.dart';
 import 'package:desafio_tecnico_bus2/shared/services/navigation.service.dart';
 import 'package:desafio_tecnico_bus2/shared/services/selected_user.service.dart';
 import 'package:flutter/material.dart';
@@ -52,10 +53,14 @@ class HomeViewModel extends ChangeNotifier {
       final newUsers = await _userRepository.getUsers();
       _listUsers = [..._listUsers, ...newUsers];
       notifyListeners();
+    } on UserRepositoryException catch (e) {
+      _errorMessage = e.message;
+      debugPrint('Erro no repositório: $e');
+      notifyListeners();
     } catch (e) {
       _errorMessage =
           'Erro ao carregar usuários. Verifique sua conexão com a internet.';
-      debugPrint('Erro na requisição: $e');
+      debugPrint('Erro inesperado na requisição: $e');
       notifyListeners();
     }
   }

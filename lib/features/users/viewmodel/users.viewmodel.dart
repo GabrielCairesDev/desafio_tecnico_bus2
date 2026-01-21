@@ -1,5 +1,6 @@
 import 'package:desafio_tecnico_bus2/shared/models/user.model.dart';
 import 'package:desafio_tecnico_bus2/shared/repositories/repositories.imports.dart';
+import 'package:desafio_tecnico_bus2/shared/exceptions/repository_exception.dart';
 import 'package:desafio_tecnico_bus2/shared/services/navigation.service.dart';
 import 'package:desafio_tecnico_bus2/shared/services/selected_user.service.dart';
 import 'package:flutter/material.dart';
@@ -26,9 +27,12 @@ class UsersViewModel extends ChangeNotifier {
     try {
       _errorMessage = '';
       _listUsers = await _userStorageRepository.getAllUsers();
+    } on UserStorageRepositoryException catch (e) {
+      _errorMessage = e.message;
+      debugPrint('Erro no repositório de armazenamento: $e');
     } catch (e) {
       _errorMessage = 'Erro ao carregar lista de usuários salvos.';
-      debugPrint('Erro ao carregar lista de usuários: $e');
+      debugPrint('Erro inesperado ao carregar lista de usuários: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -38,15 +42,14 @@ class UsersViewModel extends ChangeNotifier {
   void removeUser(UserModel user) async {
     try {
       _errorMessage = '';
-      final success = await _userStorageRepository.removeUser(user.login.uuid);
-      if (success) {
-        _listUsers = _listUsers.where((u) => u.login.uuid != user.login.uuid).toList();
-      } else {
-        _errorMessage = 'Erro ao remover usuário. Tente novamente.';
-      }
+      await _userStorageRepository.removeUser(user.login.uuid);
+      _listUsers = _listUsers.where((u) => u.login.uuid != user.login.uuid).toList();
+    } on UserStorageRepositoryException catch (e) {
+      _errorMessage = e.message;
+      debugPrint('Erro no repositório de armazenamento: $e');
     } catch (e) {
       _errorMessage = 'Erro ao remover usuário. Tente novamente.';
-      debugPrint('Erro ao remover usuário: $e');
+      debugPrint('Erro inesperado ao remover usuário: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
