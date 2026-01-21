@@ -12,6 +12,8 @@ class DetailsViewModel extends ChangeNotifier {
   bool _isUserSaved = false;
   UserModel? _selectedUser;
   String _errorMessage = '';
+  Future<void>? _saveUserFuture;
+  Future<void>? _checkSavedFuture;
 
   bool get isLoading => _isLoading;
   bool get isUserSaved => _isUserSaved;
@@ -39,8 +41,24 @@ class DetailsViewModel extends ChangeNotifier {
   }
 
   Future<void> onPressSave(UserModel user) async {
+    if (_saveUserFuture != null) {
+      return _saveUserFuture!;
+    }
+
+    _saveUserFuture = _performSaveUser(user);
     try {
+      await _saveUserFuture;
+    } finally {
+      _saveUserFuture = null;
+    }
+  }
+
+  Future<void> _performSaveUser(UserModel user) async {
+    try {
+      _isLoading = true;
       _errorMessage = '';
+      notifyListeners();
+
       if (_isUserSaved) {
         await _userStorageRepository.removeUser(user.login.uuid);
         _isUserSaved = false;
@@ -63,6 +81,19 @@ class DetailsViewModel extends ChangeNotifier {
   }
 
   Future<void> checkIfUserIsSaved(String userUuid) async {
+    if (_checkSavedFuture != null) {
+      return _checkSavedFuture!;
+    }
+
+    _checkSavedFuture = _performCheckIfUserIsSaved(userUuid);
+    try {
+      await _checkSavedFuture;
+    } finally {
+      _checkSavedFuture = null;
+    }
+  }
+
+  Future<void> _performCheckIfUserIsSaved(String userUuid) async {
     try {
       _errorMessage = '';
       _isUserSaved = await _userStorageRepository.isUserSaved(userUuid);

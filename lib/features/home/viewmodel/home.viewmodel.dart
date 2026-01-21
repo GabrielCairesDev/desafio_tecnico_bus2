@@ -20,6 +20,7 @@ class HomeViewModel extends ChangeNotifier {
 
   Ticker? _ticker;
   DateTime? _lastExecution;
+  Future<void>? _fetchUserFuture;
 
   HomeViewModel({
     required IUserRepository userRepository,
@@ -48,6 +49,20 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchUser() async {
+    // Previne múltiplas chamadas simultâneas
+    if (_fetchUserFuture != null) {
+      return _fetchUserFuture!;
+    }
+
+    _fetchUserFuture = _performFetchUser();
+    try {
+      await _fetchUserFuture;
+    } finally {
+      _fetchUserFuture = null;
+    }
+  }
+
+  Future<void> _performFetchUser() async {
     try {
       _errorMessage = '';
       final newUsers = await _userRepository.getUsers();
