@@ -7,12 +7,15 @@ class DetailsViewModel extends ChangeNotifier {
   final IUserStorageRepository _userStorageRepository;
   final SelectedUserService _selectedUserService;
 
-  bool isLoading = true;
-  bool isUserSaved = false;
+  bool _isLoading = true;
+  bool _isUserSaved = false;
   UserModel? _selectedUser;
-  final errorMessage = ValueNotifier<String>('');
+  String _errorMessage = '';
 
+  bool get isLoading => _isLoading;
+  bool get isUserSaved => _isUserSaved;
   UserModel? get selectedUser => _selectedUser;
+  String get errorMessage => _errorMessage;
 
   DetailsViewModel({
     required IUserStorageRepository userStorageRepository,
@@ -21,6 +24,7 @@ class DetailsViewModel extends ChangeNotifier {
        _selectedUserService = selectedUserService;
 
   void initialize() {
+    _isLoading = true;
     final user = _selectedUserService.selectedUser;
 
     if (user == null) {
@@ -35,51 +39,50 @@ class DetailsViewModel extends ChangeNotifier {
 
   Future<void> onPressSave(UserModel user) async {
     try {
-      errorMessage.value = '';
-      if (isUserSaved) {
+      _errorMessage = '';
+      if (_isUserSaved) {
         final success = await _userStorageRepository.removeUser(
           user.login.uuid,
         );
         if (success) {
-          isUserSaved = false;
+          _isUserSaved = false;
         } else {
-          errorMessage.value = 'Erro ao remover usuário. Tente novamente.';
+          _errorMessage = 'Erro ao remover usuário. Tente novamente.';
         }
       } else {
         final success = await _userStorageRepository.saveUser(user);
         if (success) {
-          isUserSaved = true;
+          _isUserSaved = true;
         } else {
-          errorMessage.value = 'Erro ao salvar usuário. Tente novamente.';
+          _errorMessage = 'Erro ao salvar usuário. Tente novamente.';
         }
       }
     } catch (e) {
-      errorMessage.value = isUserSaved
+      _errorMessage = _isUserSaved
           ? 'Erro ao remover usuário. Tente novamente.'
           : 'Erro ao salvar usuário. Tente novamente.';
       debugPrint('Erro ao salvar usuário: $e');
     } finally {
-      isLoading = false;
+      _isLoading = false;
       notifyListeners();
     }
   }
 
   Future<void> checkIfUserIsSaved(String userUuid) async {
     try {
-      errorMessage.value = '';
-      isUserSaved = await _userStorageRepository.isUserSaved(userUuid);
+      _errorMessage = '';
+      _isUserSaved = await _userStorageRepository.isUserSaved(userUuid);
     } catch (e) {
-      errorMessage.value = 'Erro ao verificar status do usuário.';
+      _errorMessage = 'Erro ao verificar status do usuário.';
       debugPrint('Erro ao verificar usuário: $e');
     } finally {
-      isLoading = false;
+      _isLoading = false;
       notifyListeners();
     }
   }
 
   @override
   void dispose() {
-    errorMessage.dispose();
     super.dispose();
   }
 }

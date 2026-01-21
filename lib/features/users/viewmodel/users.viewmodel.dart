@@ -8,9 +8,13 @@ class UsersViewModel extends ChangeNotifier {
   final IUserStorageRepository _userStorageRepository;
   final SelectedUserService _selectedUserService;
 
-  bool isLoading = true;
-  List<UserModel> listUsers = [];
-  final errorMessage = ValueNotifier<String>('');
+  bool _isLoading = true;
+  List<UserModel> _listUsers = [];
+  String _errorMessage = '';
+
+  bool get isLoading => _isLoading;
+  List<UserModel> get listUsers => List.unmodifiable(_listUsers);
+  String get errorMessage => _errorMessage;
 
   UsersViewModel({
     required IUserStorageRepository userStorageRepository,
@@ -20,31 +24,31 @@ class UsersViewModel extends ChangeNotifier {
 
   void getUsers() async {
     try {
-      errorMessage.value = '';
-      listUsers = await _userStorageRepository.getAllUsers();
+      _errorMessage = '';
+      _listUsers = await _userStorageRepository.getAllUsers();
     } catch (e) {
-      errorMessage.value = 'Erro ao carregar lista de usuários salvos.';
+      _errorMessage = 'Erro ao carregar lista de usuários salvos.';
       debugPrint('Erro ao carregar lista de usuários: $e');
     } finally {
-      isLoading = false;
+      _isLoading = false;
       notifyListeners();
     }
   }
 
   void removeUser(UserModel user) async {
     try {
-      errorMessage.value = '';
+      _errorMessage = '';
       final success = await _userStorageRepository.removeUser(user.login.uuid);
       if (success) {
-        listUsers.remove(user);
+        _listUsers = _listUsers.where((u) => u.login.uuid != user.login.uuid).toList();
       } else {
-        errorMessage.value = 'Erro ao remover usuário. Tente novamente.';
+        _errorMessage = 'Erro ao remover usuário. Tente novamente.';
       }
     } catch (e) {
-      errorMessage.value = 'Erro ao remover usuário. Tente novamente.';
+      _errorMessage = 'Erro ao remover usuário. Tente novamente.';
       debugPrint('Erro ao remover usuário: $e');
     } finally {
-      isLoading = false;
+      _isLoading = false;
       notifyListeners();
     }
   }
@@ -64,7 +68,6 @@ class UsersViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    errorMessage.dispose();
     super.dispose();
   }
 }

@@ -18,48 +18,50 @@ class ScaffoldWidget extends StatefulWidget {
   final bool isLoading;
   final Widget? floatingActionButton;
   final EdgeInsetsGeometry padding;
-  final ValueNotifier<String>? errorMessage;
+  final String? errorMessage;
 
   @override
   State<ScaffoldWidget> createState() => _ScaffoldWidgetState();
 }
 
 class _ScaffoldWidgetState extends State<ScaffoldWidget> {
-  String _lastErrorMessage = '';
+  String? _lastErrorMessage;
 
   @override
   void initState() {
     super.initState();
-    widget.errorMessage?.addListener(_handleError);
-  }
-
-  void _handleError() {
-    if (widget.errorMessage == null) return;
-    
-    final errorMessage = widget.errorMessage!.value;
-    
-    if (errorMessage.isNotEmpty && errorMessage != _lastErrorMessage) {
-      _lastErrorMessage = errorMessage;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && widget.errorMessage != null && 
-            widget.errorMessage!.value.isNotEmpty) {
-          ErrorSnackBar.show(
-            context,
-            widget.errorMessage!.value,
-            onDismiss: () {
-              widget.errorMessage?.value = '';
-            },
-          );
-          widget.errorMessage?.value = '';
-        }
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _handleError();
+    });
   }
 
   @override
-  void dispose() {
-    widget.errorMessage?.removeListener(_handleError);
-    super.dispose();
+  void didUpdateWidget(ScaffoldWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.errorMessage != widget.errorMessage) {
+      _handleError();
+    }
+  }
+
+  void _handleError() {
+    final errorMessage = widget.errorMessage;
+    
+    if (errorMessage != null && 
+        errorMessage.isNotEmpty && 
+        errorMessage != _lastErrorMessage) {
+      _lastErrorMessage = errorMessage;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && widget.errorMessage != null && 
+            widget.errorMessage!.isNotEmpty) {
+          ErrorSnackBar.show(
+            context,
+            widget.errorMessage!,
+          );
+        }
+      });
+    } else if (errorMessage == null || errorMessage.isEmpty) {
+      _lastErrorMessage = null;
+    }
   }
 
   @override

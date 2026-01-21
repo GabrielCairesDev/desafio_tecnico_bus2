@@ -9,8 +9,11 @@ class HomeViewModel extends ChangeNotifier {
   final IUserRepository _userRepository;
   final SelectedUserService _selectedUserService;
 
-  List<UserModel> listUsers = [];
-  final errorMessage = ValueNotifier<String>('');
+  List<UserModel> _listUsers = [];
+  String _errorMessage = '';
+
+  List<UserModel> get listUsers => List.unmodifiable(_listUsers);
+  String get errorMessage => _errorMessage;
 
   static const int _intervalSeconds = 5;
 
@@ -44,12 +47,12 @@ class HomeViewModel extends ChangeNotifier {
 
   Future<void> fetchUser() async {
     try {
-      errorMessage.value = '';
+      _errorMessage = '';
       final newUsers = await _userRepository.getUsers();
-      listUsers.addAll(newUsers);
+      _listUsers = [..._listUsers, ...newUsers];
       notifyListeners();
     } catch (e) {
-      errorMessage.value =
+      _errorMessage =
           'Erro ao carregar usuários. Verifique sua conexão com a internet.';
       debugPrint('Erro na requisição: $e');
       notifyListeners();
@@ -68,7 +71,6 @@ class HomeViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _ticker?.dispose();
-    errorMessage.dispose();
     super.dispose();
   }
 }
