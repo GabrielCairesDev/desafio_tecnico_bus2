@@ -1,4 +1,3 @@
-// lib/features/home/view/home.view.dart
 import 'package:desafio_tecnico_bus2/config/injection.dart';
 import 'package:desafio_tecnico_bus2/shared/widgets/widgets.imports.dart';
 import 'package:flutter/material.dart';
@@ -35,8 +34,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         return ScaffoldWidget(
           title: 'Tela inicial',
           isLoading: _viewModel.listUsers.isEmpty,
-          errorMessage: _viewModel.errorMessage.isNotEmpty 
-              ? _viewModel.errorMessage 
+          errorMessage: _viewModel.errorMessage.isNotEmpty
+              ? _viewModel.errorMessage
               : null,
           body: ListUsersWidget(
             listUsers: _viewModel.listUsers,

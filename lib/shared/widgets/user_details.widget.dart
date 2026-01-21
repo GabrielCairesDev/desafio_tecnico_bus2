@@ -17,12 +17,10 @@ class UserDetailsWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header com avatar e nome principal
           UserHeaderWidget(user: user),
 
           const SizedBox(height: 24),
 
-          // Cards de informações organizados
           InfoCardWidget(
             icon: Icons.person_outline,
             title: 'Informações Pessoais',

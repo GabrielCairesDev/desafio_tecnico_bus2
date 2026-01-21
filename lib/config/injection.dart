@@ -16,7 +16,6 @@ Future<void> setupInjection() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   getIt.registerSingleton<SharedPreferences>(sharedPreferences);
 
-  // Registra a implementação de persistência (pode ser trocada facilmente)
   getIt.registerLazySingleton<IPersistenceService>(
     () => SharedPreferencesPersistence(getIt<SharedPreferences>()),
   );

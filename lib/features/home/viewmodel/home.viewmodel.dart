@@ -49,7 +49,6 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchUser() async {
-    // Previne múltiplas chamadas simultâneas
     if (_fetchUserFuture != null) {
       return _fetchUserFuture!;
     }

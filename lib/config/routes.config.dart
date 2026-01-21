@@ -30,7 +30,6 @@ class Routes {
     }
   }
 
-  // Mantido para compatibilidade, mas não será usado
   static final Map<String, WidgetBuilder> routes = {
     home: (context) => const HomeView(),
     details: (context) => const DetailsView(),

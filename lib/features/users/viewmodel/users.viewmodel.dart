@@ -26,7 +26,6 @@ class UsersViewModel extends ChangeNotifier {
        _selectedUserService = selectedUserService;
 
   void getUsers() async {
-    // Previne múltiplas chamadas simultâneas
     if (_getUsersFuture != null) {
       return _getUsersFuture!;
     }

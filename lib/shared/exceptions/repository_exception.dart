@@ -1,14 +1,9 @@
-/// Exceção base para erros relacionados a repositories
 class RepositoryException implements Exception {
   final String message;
   final Object? originalError;
   final StackTrace? stackTrace;
 
-  RepositoryException(
-    this.message, {
-    this.originalError,
-    this.stackTrace,
-  });
+  RepositoryException(this.message, {this.originalError, this.stackTrace});
 
   @override
   String toString() {
@@ -19,7 +14,6 @@ class RepositoryException implements Exception {
   }
 }
 
-/// Exceção específica para erros de repositório de usuários da API
 class UserRepositoryException extends RepositoryException {
   UserRepositoryException(
     super.message, {
@@ -33,7 +27,6 @@ class UserRepositoryException extends RepositoryException {
   }
 }
 
-/// Exceção específica para erros de repositório de armazenamento
 class UserStorageRepositoryException extends RepositoryException {
   UserStorageRepositoryException(
     super.message, {
