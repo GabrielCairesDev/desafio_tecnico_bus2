@@ -1,4 +1,3 @@
-import 'package:desafio_tecnico_bus2/config/routes.config.dart';
 import 'package:desafio_tecnico_bus2/shared/models/user.model.dart';
 import 'package:desafio_tecnico_bus2/shared/services/storage.service.dart';
 import 'package:flutter/material.dart';
@@ -30,12 +29,7 @@ class UsersViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> navigateToDetails(BuildContext context, UserModel user) async {
-    final result = await Navigator.pushNamed(
-      context,
-      Routes.details,
-      arguments: user,
-    );
-    if (result == true) getUsers();
+  Future<void> refreshUsers() async {
+    getUsers();
   }
 }

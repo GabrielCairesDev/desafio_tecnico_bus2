@@ -1,4 +1,5 @@
 // lib/features/home/view/home.view.dart
+import 'package:desafio_tecnico_bus2/config/routes.config.dart';
 import 'package:desafio_tecnico_bus2/shared/widgets/widgets.imports.dart';
 import 'package:flutter/material.dart';
 import '../viewmodel/home.viewmodel.dart';
@@ -36,10 +37,11 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           isLoading: _viewModel.listUsers.isEmpty,
           body: ListUsersWidget(
             listUsers: _viewModel.listUsers,
-            onTap: (user) => _viewModel.navigateToDetails(context, user),
+            onTap: (user) =>
+                Navigator.pushNamed(context, Routes.details, arguments: user),
           ),
           floatingActionButton: FloatingActionButton(
-            onPressed: () => _viewModel.navigateToUsers(context),
+            onPressed: () => Navigator.pushNamed(context, Routes.users),
             child: Icon(Icons.storage),
           ),
         );

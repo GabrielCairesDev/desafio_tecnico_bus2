@@ -1,3 +1,4 @@
+import 'package:desafio_tecnico_bus2/config/routes.config.dart';
 import 'package:desafio_tecnico_bus2/features/users/viewmodel/users.viewmodel.dart';
 import 'package:desafio_tecnico_bus2/shared/widgets/widgets.imports.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +37,16 @@ class _UsersViewState extends State<UsersView> {
               ? Center(child: Text('Nenhum usuário persistido'))
               : ListUsersWidget(
                   listUsers: _viewModel.listUsers,
-                  onTap: (user) => _viewModel.navigateToDetails(context, user),
+                  onTap: (user) async {
+                    final result = await Navigator.pushNamed(
+                      context,
+                      Routes.details,
+                      arguments: user,
+                    );
+                    if (result == true) {
+                      _viewModel.refreshUsers();
+                    }
+                  },
                   onTapDelete: (user) => _viewModel.removeUser(user),
                 ),
         );
