@@ -1,7 +1,7 @@
 // lib/features/home/view/home.view.dart
 import 'package:desafio_tecnico_bus2/config/injection.dart';
 import 'package:desafio_tecnico_bus2/config/routes.config.dart';
-import 'package:desafio_tecnico_bus2/shared/services/user.services.dart';
+import 'package:desafio_tecnico_bus2/shared/repositories/repositories.imports.dart';
 import 'package:desafio_tecnico_bus2/shared/widgets/widgets.imports.dart';
 import 'package:flutter/material.dart';
 import '../viewmodel/home.viewmodel.dart';
@@ -19,7 +19,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _viewModel = HomeViewModel(userService: getIt<IUserService>());
+    _viewModel = HomeViewModel(userRepository: getIt<IUserRepository>());
     _viewModel.initialize(this);
   }
 

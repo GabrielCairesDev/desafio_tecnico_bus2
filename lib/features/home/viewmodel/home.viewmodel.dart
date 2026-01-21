@@ -1,11 +1,11 @@
 import 'package:desafio_tecnico_bus2/shared/models/models.imports.dart';
-import 'package:desafio_tecnico_bus2/shared/services/user.services.dart';
+import 'package:desafio_tecnico_bus2/shared/repositories/repositories.imports.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  final IUserService _userService;
-  
+  final IUserRepository _userRepository;
+
   List<UserModel> listUsers = [];
   final errorMessage = ValueNotifier<String>('');
 
@@ -14,7 +14,8 @@ class HomeViewModel extends ChangeNotifier {
   Ticker? _ticker;
   int _lastExecutionSecond = 0;
 
-  HomeViewModel({required IUserService userService}) : _userService = userService;
+  HomeViewModel({required IUserRepository userRepository})
+    : _userRepository = userRepository;
 
   Future<void> initialize(TickerProvider vsync) async {
     await fetchUser();
@@ -38,8 +39,8 @@ class HomeViewModel extends ChangeNotifier {
   Future<void> fetchUser() async {
     try {
       errorMessage.value = '';
-      final newUser = (await _userService.getUser()).results;
-      listUsers.addAll(newUser);
+      final newUsers = await _userRepository.getUsers();
+      listUsers.addAll(newUsers);
       notifyListeners();
     } catch (e) {
       errorMessage.value =
