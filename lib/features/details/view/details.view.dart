@@ -1,6 +1,5 @@
 import 'package:desafio_tecnico_bus2/config/injection.dart';
 import 'package:desafio_tecnico_bus2/features/details/viewmodel/details.viewmodel.dart';
-import 'package:desafio_tecnico_bus2/shared/models/user.model.dart';
 import 'package:desafio_tecnico_bus2/shared/repositories/repositories.imports.dart';
 import 'package:desafio_tecnico_bus2/shared/services/selected_user.service.dart';
 import 'package:desafio_tecnico_bus2/shared/widgets/widgets.imports.dart';
@@ -15,25 +14,15 @@ class DetailsView extends StatefulWidget {
 
 class _DetailsViewState extends State<DetailsView> {
   late final DetailsViewModel _viewModel;
-  late final UserModel _selectedUser;
 
   @override
   void initState() {
     super.initState();
-    final selectedUserService = getIt<SelectedUserService>();
-    final user = selectedUserService.selectedUser;
-
-    if (user == null) {
-      throw Exception(
-        'Nenhum usuário selecionado. É necessário selecionar um usuário antes de navegar para detalhes.',
-      );
-    }
-
-    _selectedUser = user;
     _viewModel = DetailsViewModel(
       userStorageRepository: getIt<IUserStorageRepository>(),
+      selectedUserService: getIt<SelectedUserService>(),
     );
-    _viewModel.checkIfUserIsSaved(_selectedUser.login.uuid);
+    _viewModel.initialize();
   }
 
   @override
@@ -60,14 +49,16 @@ class _DetailsViewState extends State<DetailsView> {
             isLoading: _viewModel.isLoading,
             title: 'Detalhes',
             errorMessage: _viewModel.errorMessage,
-            body: _viewModel.isLoading
+            body: _viewModel.isLoading || _viewModel.selectedUser == null
                 ? Center(child: CircularProgressIndicator())
-                : UserDetailsWidget(user: _selectedUser),
+                : UserDetailsWidget(user: _viewModel.selectedUser!),
             floatingActionButton: SaveFabWidget(
               show: _viewModel.isUserSaved,
               isLoading: _viewModel.isLoading,
               onPressed: () async {
-                await _viewModel.onPressSave(_selectedUser);
+                if (_viewModel.selectedUser != null) {
+                  await _viewModel.onPressSave(_viewModel.selectedUser!);
+                }
               },
             ),
           );

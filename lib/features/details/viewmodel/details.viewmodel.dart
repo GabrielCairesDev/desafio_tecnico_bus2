@@ -1,16 +1,37 @@
 import 'package:desafio_tecnico_bus2/shared/models/user.model.dart';
 import 'package:desafio_tecnico_bus2/shared/repositories/repositories.imports.dart';
+import 'package:desafio_tecnico_bus2/shared/services/selected_user.service.dart';
 import 'package:flutter/material.dart';
 
 class DetailsViewModel extends ChangeNotifier {
   final IUserStorageRepository _userStorageRepository;
+  final SelectedUserService _selectedUserService;
 
   bool isLoading = true;
   bool isUserSaved = false;
+  UserModel? _selectedUser;
   final errorMessage = ValueNotifier<String>('');
 
-  DetailsViewModel({required IUserStorageRepository userStorageRepository})
-    : _userStorageRepository = userStorageRepository;
+  UserModel? get selectedUser => _selectedUser;
+
+  DetailsViewModel({
+    required IUserStorageRepository userStorageRepository,
+    required SelectedUserService selectedUserService,
+  })  : _userStorageRepository = userStorageRepository,
+        _selectedUserService = selectedUserService;
+
+  void initialize() {
+    final user = _selectedUserService.selectedUser;
+
+    if (user == null) {
+      throw Exception(
+        'Nenhum usuário selecionado. É necessário selecionar um usuário antes de navegar para detalhes.',
+      );
+    }
+
+    _selectedUser = user;
+    checkIfUserIsSaved(_selectedUser!.login.uuid);
+  }
 
   Future<void> onPressSave(UserModel user) async {
     try {
