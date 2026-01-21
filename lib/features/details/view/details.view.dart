@@ -45,6 +45,7 @@ class _DetailsViewState extends State<DetailsView> {
           return ScaffoldWidget(
             isLoading: _viewModel.isLoading,
             title: 'Detalhes',
+            errorMessage: _viewModel.errorMessage,
             body: _viewModel.isLoading
                 ? Center(child: CircularProgressIndicator())
                 : UserDetailsWidget(user: widget.selectedUser),

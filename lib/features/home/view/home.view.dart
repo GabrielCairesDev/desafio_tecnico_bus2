@@ -35,6 +35,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         return ScaffoldWidget(
           title: 'Tela inicial',
           isLoading: _viewModel.listUsers.isEmpty,
+          errorMessage: _viewModel.errorMessage,
           body: ListUsersWidget(
             listUsers: _viewModel.listUsers,
             onTap: (user) =>

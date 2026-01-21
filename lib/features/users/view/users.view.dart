@@ -33,6 +33,7 @@ class _UsersViewState extends State<UsersView> {
       builder: (context, child) {
         return ScaffoldWidget(
           title: 'Usuários Persistidos',
+          errorMessage: _viewModel.errorMessage,
           body: _viewModel.listUsers.isEmpty
               ? Center(child: Text('Nenhum usuário persistido'))
               : ListUsersWidget(

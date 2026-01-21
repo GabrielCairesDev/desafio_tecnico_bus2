@@ -9,3 +9,4 @@ export 'info_card.widget.dart';
 export 'info_row.widget.dart';
 export 'photo_row.widget.dart';
 export 'save_fab.widget.dart';
+export 'error_snackbar.widget.dart';

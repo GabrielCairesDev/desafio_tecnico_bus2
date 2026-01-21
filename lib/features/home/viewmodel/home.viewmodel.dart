@@ -5,6 +5,7 @@ import 'package:flutter/scheduler.dart';
 
 class HomeViewModel extends ChangeNotifier {
   List<UserModel> listUsers = [];
+  final errorMessage = ValueNotifier<String>('');
 
   static const int _intervalSeconds = 5;
 
@@ -32,17 +33,22 @@ class HomeViewModel extends ChangeNotifier {
 
   Future<void> fetchUser() async {
     try {
+      errorMessage.value = '';
       final newUser = (await UserService.getUser()).results;
       listUsers.addAll(newUser);
       notifyListeners();
     } catch (e) {
+      errorMessage.value =
+          'Erro ao carregar usuários. Verifique sua conexão com a internet.';
       debugPrint('Erro na requisição: $e');
+      notifyListeners();
     }
   }
 
   @override
   void dispose() {
     _ticker?.dispose();
+    errorMessage.dispose();
     super.dispose();
   }
 }

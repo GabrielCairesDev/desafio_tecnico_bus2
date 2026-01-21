@@ -5,17 +5,32 @@ import 'package:flutter/material.dart';
 class DetailsViewModel extends ChangeNotifier {
   bool isLoading = true;
   bool isUserSaved = false;
+  final errorMessage = ValueNotifier<String>('');
 
   Future<void> onPressSave(UserModel user) async {
     try {
+      errorMessage.value = '';
       if (isUserSaved) {
-        await StorageService.removeUserFromList(user.login.uuid);
-        isUserSaved = false;
+        final success = await StorageService.removeUserFromList(
+          user.login.uuid,
+        );
+        if (success) {
+          isUserSaved = false;
+        } else {
+          errorMessage.value = 'Erro ao remover usuário. Tente novamente.';
+        }
       } else {
-        await StorageService.saveUserToList(user);
-        isUserSaved = true;
+        final success = await StorageService.saveUserToList(user);
+        if (success) {
+          isUserSaved = true;
+        } else {
+          errorMessage.value = 'Erro ao salvar usuário. Tente novamente.';
+        }
       }
     } catch (e) {
+      errorMessage.value = isUserSaved
+          ? 'Erro ao remover usuário. Tente novamente.'
+          : 'Erro ao salvar usuário. Tente novamente.';
       debugPrint('Erro ao salvar usuário: $e');
     } finally {
       isLoading = false;
@@ -25,12 +40,20 @@ class DetailsViewModel extends ChangeNotifier {
 
   Future<void> checkIfUserIsSaved(String userUuid) async {
     try {
+      errorMessage.value = '';
       isUserSaved = (await StorageService.isUserInList(userUuid));
     } catch (e) {
+      errorMessage.value = 'Erro ao verificar status do usuário.';
       debugPrint('Erro ao verificar usuário: $e');
     } finally {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    errorMessage.dispose();
+    super.dispose();
   }
 }
