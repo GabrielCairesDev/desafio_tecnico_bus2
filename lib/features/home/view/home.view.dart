@@ -17,7 +17,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _viewModel = HomeViewModel();
-    _viewModel.startTicker(this);
+    _viewModel.initialize(this);
   }
 
   @override

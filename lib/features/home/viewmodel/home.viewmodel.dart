@@ -12,6 +12,11 @@ class HomeViewModel extends ChangeNotifier {
   Ticker? _ticker;
   int _lastExecutionSecond = 0;
 
+  Future<void> initialize(TickerProvider vsync) async {
+    await fetchUser();
+    startTicker(vsync);
+  }
+
   void startTicker(TickerProvider vsync) {
     _ticker = vsync.createTicker((elapsed) {
       final currentSecond = elapsed.inSeconds;
@@ -20,13 +25,13 @@ class HomeViewModel extends ChangeNotifier {
           currentSecond % _intervalSeconds == 0 &&
           currentSecond != _lastExecutionSecond) {
         _lastExecutionSecond = currentSecond;
-        onTick();
+        fetchUser();
       }
     });
     _ticker?.start();
   }
 
-  void onTick() async {
+  Future<void> fetchUser() async {
     try {
       final newUser = (await UserService.getUser()).results;
       listUsers.addAll(newUser);
