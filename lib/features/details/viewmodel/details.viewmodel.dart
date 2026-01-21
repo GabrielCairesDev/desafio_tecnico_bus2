@@ -17,8 +17,8 @@ class DetailsViewModel extends ChangeNotifier {
   DetailsViewModel({
     required IUserStorageRepository userStorageRepository,
     required SelectedUserService selectedUserService,
-  })  : _userStorageRepository = userStorageRepository,
-        _selectedUserService = selectedUserService;
+  }) : _userStorageRepository = userStorageRepository,
+       _selectedUserService = selectedUserService;
 
   void initialize() {
     final user = _selectedUserService.selectedUser;

@@ -1,8 +1,5 @@
 import 'package:desafio_tecnico_bus2/config/injection.dart';
-import 'package:desafio_tecnico_bus2/config/routes.config.dart';
 import 'package:desafio_tecnico_bus2/features/users/viewmodel/users.viewmodel.dart';
-import 'package:desafio_tecnico_bus2/shared/repositories/repositories.imports.dart';
-import 'package:desafio_tecnico_bus2/shared/services/selected_user.service.dart';
 import 'package:desafio_tecnico_bus2/shared/widgets/widgets.imports.dart';
 import 'package:flutter/material.dart';
 
@@ -19,9 +16,7 @@ class _UsersViewState extends State<UsersView> {
   @override
   void initState() {
     super.initState();
-    _viewModel = UsersViewModel(
-      userStorageRepository: getIt<IUserStorageRepository>(),
-    );
+    _viewModel = getIt<UsersViewModel>();
     _viewModel.getUsers();
   }
 
@@ -40,19 +35,10 @@ class _UsersViewState extends State<UsersView> {
           title: 'Usuários Persistidos',
           errorMessage: _viewModel.errorMessage,
           body: _viewModel.listUsers.isEmpty
-              ? Center(child: Text('Nenhum usuário persistido'))
+              ? const Center(child: Text('Nenhum usuário persistido'))
               : ListUsersWidget(
                   listUsers: _viewModel.listUsers,
-                  onTap: (user) async {
-                    getIt<SelectedUserService>().setSelectedUser(user);
-                    final result = await Navigator.pushNamed(
-                      context,
-                      Routes.details,
-                    );
-                    if (result == true) {
-                      _viewModel.refreshUsers();
-                    }
-                  },
+                  onTap: (user) => _viewModel.navigateToDetails(context, user),
                   onTapDelete: (user) => _viewModel.removeUser(user),
                 ),
         );

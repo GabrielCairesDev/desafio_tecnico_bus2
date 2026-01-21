@@ -126,8 +126,22 @@ class StorageService implements IStorageService {
   @override
   Future<bool> isUserInList(String userUuid) async {
     try {
-      final users = await getUsersList();
-      return users.any((user) => user.login.uuid == userUuid);
+      final usersJson = _prefs.getString(_usersListKey);
+
+      if (usersJson == null) {
+        return false;
+      }
+
+      final List<dynamic> usersListData = jsonDecode(usersJson);
+      return usersListData.any((userMap) {
+        if (userMap is Map<String, dynamic>) {
+          final login = userMap['login'];
+          if (login is Map<String, dynamic>) {
+            return login['uuid'] == userUuid;
+          }
+        }
+        return false;
+      });
     } catch (e) {
       debugPrint('Erro ao verificar usuário: $e');
       return false;

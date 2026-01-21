@@ -1,8 +1,5 @@
 // lib/features/home/view/home.view.dart
 import 'package:desafio_tecnico_bus2/config/injection.dart';
-import 'package:desafio_tecnico_bus2/config/routes.config.dart';
-import 'package:desafio_tecnico_bus2/shared/repositories/repositories.imports.dart';
-import 'package:desafio_tecnico_bus2/shared/services/selected_user.service.dart';
 import 'package:desafio_tecnico_bus2/shared/widgets/widgets.imports.dart';
 import 'package:flutter/material.dart';
 import '../viewmodel/home.viewmodel.dart';
@@ -20,7 +17,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _viewModel = HomeViewModel(userRepository: getIt<IUserRepository>());
+    _viewModel = getIt<HomeViewModel>();
     _viewModel.initialize(this);
   }
 
@@ -41,14 +38,11 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           errorMessage: _viewModel.errorMessage,
           body: ListUsersWidget(
             listUsers: _viewModel.listUsers,
-            onTap: (user) {
-              getIt<SelectedUserService>().setSelectedUser(user);
-              Navigator.pushNamed(context, Routes.details);
-            },
+            onTap: (user) => _viewModel.navigateToDetails(context, user),
           ),
           floatingActionButton: FloatingActionButton(
-            onPressed: () => Navigator.pushNamed(context, Routes.users),
-            child: Icon(Icons.storage),
+            onPressed: () => _viewModel.navigateToUsers(context),
+            child: const Icon(Icons.storage),
           ),
         );
       },

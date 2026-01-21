@@ -1,16 +1,22 @@
 import 'package:desafio_tecnico_bus2/shared/models/user.model.dart';
 import 'package:desafio_tecnico_bus2/shared/repositories/repositories.imports.dart';
+import 'package:desafio_tecnico_bus2/shared/services/navigation.service.dart';
+import 'package:desafio_tecnico_bus2/shared/services/selected_user.service.dart';
 import 'package:flutter/material.dart';
 
 class UsersViewModel extends ChangeNotifier {
   final IUserStorageRepository _userStorageRepository;
+  final SelectedUserService _selectedUserService;
 
   bool isLoading = true;
   List<UserModel> listUsers = [];
   final errorMessage = ValueNotifier<String>('');
 
-  UsersViewModel({required IUserStorageRepository userStorageRepository})
-    : _userStorageRepository = userStorageRepository;
+  UsersViewModel({
+    required IUserStorageRepository userStorageRepository,
+    required SelectedUserService selectedUserService,
+  })  : _userStorageRepository = userStorageRepository,
+        _selectedUserService = selectedUserService;
 
   void getUsers() async {
     try {
@@ -45,6 +51,15 @@ class UsersViewModel extends ChangeNotifier {
 
   Future<void> refreshUsers() async {
     getUsers();
+  }
+
+  /// Navega para a tela de detalhes do usuário selecionado
+  Future<void> navigateToDetails(BuildContext context, UserModel user) async {
+    _selectedUserService.setSelectedUser(user);
+    final result = await NavigationService.navigateToDetails(context);
+    if (result == true) {
+      refreshUsers();
+    }
   }
 
   @override

@@ -4,6 +4,9 @@ import '../shared/services/storage.service.dart';
 import '../shared/services/user.services.dart';
 import '../shared/services/selected_user.service.dart';
 import '../shared/repositories/repositories.imports.dart';
+import '../features/home/viewmodel/home.viewmodel.dart';
+import '../features/details/viewmodel/details.viewmodel.dart';
+import '../features/users/viewmodel/users.viewmodel.dart';
 
 final getIt = GetIt.instance;
 
@@ -26,4 +29,25 @@ Future<void> setupInjection() async {
   );
 
   getIt.registerSingleton<SelectedUserService>(SelectedUserService());
+
+  getIt.registerFactory<HomeViewModel>(
+    () => HomeViewModel(
+      userRepository: getIt<IUserRepository>(),
+      selectedUserService: getIt<SelectedUserService>(),
+    ),
+  );
+
+  getIt.registerFactory<DetailsViewModel>(
+    () => DetailsViewModel(
+      userStorageRepository: getIt<IUserStorageRepository>(),
+      selectedUserService: getIt<SelectedUserService>(),
+    ),
+  );
+
+  getIt.registerFactory<UsersViewModel>(
+    () => UsersViewModel(
+      userStorageRepository: getIt<IUserStorageRepository>(),
+      selectedUserService: getIt<SelectedUserService>(),
+    ),
+  );
 }

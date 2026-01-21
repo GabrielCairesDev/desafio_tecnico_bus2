@@ -1,10 +1,13 @@
 import 'package:desafio_tecnico_bus2/shared/models/models.imports.dart';
 import 'package:desafio_tecnico_bus2/shared/repositories/repositories.imports.dart';
+import 'package:desafio_tecnico_bus2/shared/services/navigation.service.dart';
+import 'package:desafio_tecnico_bus2/shared/services/selected_user.service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final IUserRepository _userRepository;
+  final SelectedUserService _selectedUserService;
 
   List<UserModel> listUsers = [];
   final errorMessage = ValueNotifier<String>('');
@@ -14,8 +17,11 @@ class HomeViewModel extends ChangeNotifier {
   Ticker? _ticker;
   int _lastExecutionSecond = 0;
 
-  HomeViewModel({required IUserRepository userRepository})
-    : _userRepository = userRepository;
+  HomeViewModel({
+    required IUserRepository userRepository,
+    required SelectedUserService selectedUserService,
+  }) : _userRepository = userRepository,
+       _selectedUserService = selectedUserService;
 
   Future<void> initialize(TickerProvider vsync) async {
     await fetchUser();
@@ -48,6 +54,15 @@ class HomeViewModel extends ChangeNotifier {
       debugPrint('Erro na requisição: $e');
       notifyListeners();
     }
+  }
+
+  Future<void> navigateToDetails(BuildContext context, UserModel user) async {
+    _selectedUserService.setSelectedUser(user);
+    await NavigationService.navigateToDetails(context);
+  }
+
+  void navigateToUsers(BuildContext context) {
+    NavigationService.navigateToUsers(context);
   }
 
   @override
