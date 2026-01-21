@@ -15,10 +15,10 @@ class HomeViewModel extends ChangeNotifier {
   List<UserModel> get listUsers => List.unmodifiable(_listUsers);
   String get errorMessage => _errorMessage;
 
-  static const int _intervalSeconds = 5;
+  static const Duration _interval = Duration(seconds: 5);
 
   Ticker? _ticker;
-  int _lastExecutionSecond = 0;
+  DateTime? _lastExecution;
 
   HomeViewModel({
     required IUserRepository userRepository,
@@ -32,13 +32,14 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   void startTicker(TickerProvider vsync) {
-    _ticker = vsync.createTicker((elapsed) {
-      final currentSecond = elapsed.inSeconds;
+    _lastExecution = DateTime.now();
 
-      if (currentSecond > 0 &&
-          currentSecond % _intervalSeconds == 0 &&
-          currentSecond != _lastExecutionSecond) {
-        _lastExecutionSecond = currentSecond;
+    _ticker = vsync.createTicker((elapsed) {
+      final now = DateTime.now();
+
+      if (_lastExecution == null ||
+          now.difference(_lastExecution!) >= _interval) {
+        _lastExecution = now;
         fetchUser();
       }
     });
